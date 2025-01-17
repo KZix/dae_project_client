@@ -56,6 +56,12 @@ async function login() {
         });
         if (response.status == 200) {
           token.value = response._data;
+          const headers = {
+        Authorization: 'Bearer ' + token.value,
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      };
+      localStorage.setItem('token', token.value);
           getUserInfo();
         }
       },
@@ -90,4 +96,13 @@ async function getUserInfo() {
     console.error("user info request failed: ", e);
   }
 }
+
+onMounted(() => {
+  const storedToken = localStorage.getItem("token");
+  if (storedToken) {
+    token.value = storedToken;
+    console.log("Token restored from localStorage:", token.value);
+    getUserInfo(); // Fetch user data with the restored token
+  }
+});
 </script>
