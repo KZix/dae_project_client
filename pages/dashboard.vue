@@ -1,7 +1,6 @@
 <template>
     <div>
       <h1>Dashboard</h1>
-      <!-- Conditional rendering based on token -->
       <div v-if="token">
         <h2>Welcome, {{ user?.name || 'User' }}!</h2>
         <div>
@@ -15,6 +14,9 @@
           <button>Login</button>
         </nuxt-link>
       </div>
+    </div>
+    <div>
+        <!-- div para listar os produtos -->
     </div>
   </template>
   
