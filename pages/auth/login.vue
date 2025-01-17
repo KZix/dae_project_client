@@ -2,7 +2,7 @@
   <h1>Login Form</h1>
   <div>Username: <input v-model="loginFormData.username" /></div>
   <div>Password: <input v-model="loginFormData.password" /></div>
-  <button @click="login">LOGIN</button>
+  <button @click="handleLogin">LOGIN</button>
   <button @click="reset">RESET</button>
   <div v-if="token">
     <div>Token: {{ token }}</div>
@@ -13,96 +13,42 @@
       <pre>{{ user }}</pre>
     </div>
   </div>
-  <div v-if="messages.length > 0">
-    <h2>Messages</h2>
-    <div v-for="message in messages">
-      <pre>{{ message }}</pre>
-    </div>
-  </div>
 </template>
+
 <script setup>
+import { reactive, ref } from "vue";
+import { useAuthStore } from "~/store/auth-store.js";
+
 const config = useRuntimeConfig();
 const api = config.public.API_URL;
+
 const loginFormData = reactive({
   username: "",
   password: "",
 });
-//const token = ref(null);
-//const user = ref(null);
-import { useAuthStore } from "~/store/auth-store.js";
+
 const authStore = useAuthStore();
 const { token, user } = storeToRefs(authStore);
-const messages = ref([]);
+
 function reset() {
-  token.value = null;
-  messages.value = [];
+  authStore.logout();
 }
-async function login() {
+
+async function handleLogin() {
   try {
-    await $fetch(`${api}/auth/login`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-      body: loginFormData,
-      onResponse({ request, response, options }) {
-        messages.value.push({
-          method: options.method,
-          request: request,
-          status: response.status,
-          statusText: response.statusText,
-          payload: response._data,
-        });
-        if (response.status == 200) {
-          token.value = response._data;
-          const headers = {
-        Authorization: 'Bearer ' + token.value,
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      };
-      localStorage.setItem('token', token.value);
-          getUserInfo();
-        }
-      },
-    });
+    await authStore.login(api, loginFormData);
+    console.log("Login successful");
   } catch (e) {
-    console.error("login request failed: ", e);
-  }
-}
-async function getUserInfo() {
-  try {
-    await $fetch(`${api}/auth/user`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-        Authorization: `Bearer ${token.value}`,
-      },
-      onResponse({ request, response, options }) {
-        messages.value.push({
-          method: options.method,
-          request: request,
-          status: response.status,
-          statusText: response.statusText,
-          payload: response._data,
-        });
-        if (response.status == 200) {
-          user.value = response._data;
-        }
-      },
-    });
-  } catch (e) {
-    console.error("user info request failed: ", e);
+    console.error("Login failed:", e);
   }
 }
 
 onMounted(() => {
   const storedToken = localStorage.getItem("token");
   if (storedToken) {
-    token.value = storedToken;
-    console.log("Token restored from localStorage:", token.value);
-    getUserInfo(); // Fetch user data with the restored token
+    authStore.token = storedToken;
+    console.log("Token restored from localStorage:", authStore.token);
+    authStore.getUserInfo(api);
   }
 });
 </script>

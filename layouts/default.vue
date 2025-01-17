@@ -14,6 +14,8 @@ function logout() {
   |
   <nuxt-link to="/admins">Admins</nuxt-link>
   |
+  <nuxt-link to="/dashboard">Dashboard</nuxt-link>
+  |
   <a href="#" @click.prevent="logout">Logout</a>
   <div>
     <slot />
