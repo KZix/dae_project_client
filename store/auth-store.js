@@ -4,6 +4,15 @@ export const useAuthStore = defineStore("authStore", () => {
   const token = ref(null);
   const user = ref(null);
 
+
+  const isLoggedIn = computed(() => {
+    return user.value ? user.value.name : ''
+  })
+
+  const isAdmin = computed(() => {
+    return user.value ? user.value.role === 'Administrator' : false
+  })
+
   async function login(apiUrl, loginFormData) {
     try {
       const response = await $fetch(`${apiUrl}/auth/login`, {
@@ -61,5 +70,5 @@ export const useAuthStore = defineStore("authStore", () => {
     localStorage.removeItem("token");
   }
 
-  return { token, user, login, getUserInfo, logout };
+  return { isLoggedIn, isAdmin, token, user, login, getUserInfo, logout };
 });
