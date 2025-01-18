@@ -96,5 +96,28 @@ export const useAuthStore = defineStore("authStore", () => {
     }
   }
 
-  return { isLoggedIn, isAdmin, token, user, users, login, getUserInfo, logout, getAllUsers };
+  async function createUser(apiUrl, userData) {
+    try {
+      const response = await $fetch(`${apiUrl}/client`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          Authorization: `Bearer ${token.value}`,
+        },
+        body: userData,
+      });
+  
+      // Optionally add the new user to the existing users list
+      users.value.push(response);
+  
+      console.log("User created successfully:", response);
+      return response; // Return the created user for further use
+    } catch (error) {
+      console.error("Failed to create user:", error);
+      throw error; // Re-throw the error to handle it in the component
+    }
+  }
+
+  return { isLoggedIn, isAdmin, token, user, users, login, getUserInfo, logout, getAllUsers, createUser };
 });
