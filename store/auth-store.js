@@ -147,7 +147,25 @@ export const useAuthStore = defineStore("authStore", () => {
     }
   }
   
-  
+  async function updateClient(apiUrl, username, updatedData) {
+    try {
+      const response = await $fetch(`${apiUrl}/client/${username}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          Authorization: `Bearer ${token.value}`,
+        },
+        body: updatedData,
+      });
 
-  return { isLoggedIn, isAdmin, token, user, users, login, getUserInfo, logout, getAllUsers, createUser, fetchClientDetails };
+      console.log("Client updated successfully:", response);
+      return response; // Return the updated client details
+    } catch (error) {
+      console.error("Failed to update client:", error);
+      throw error; // Re-throw the error for handling in the component
+    }
+  }
+
+  return { isLoggedIn, isAdmin, token, user, users, login, getUserInfo, logout, getAllUsers, createUser, fetchClientDetails, updateClient };
 });
