@@ -119,5 +119,35 @@ export const useAuthStore = defineStore("authStore", () => {
     }
   }
 
-  return { isLoggedIn, isAdmin, token, user, users, login, getUserInfo, logout, getAllUsers, createUser };
+  async function fetchClientDetails(apiUrl, username) {
+    try {
+      const response = await $fetch(`${apiUrl}/client/${username}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          Authorization: `Bearer ${token.value}`,
+        },
+      });
+  
+      if (response && response.username) {
+        console.log("Client details fetched successfully:", response);
+        return response; // Return the client details
+      } else {
+        throw new Error("Invalid API response structure.");
+      }
+    } catch (error) {
+      console.error("Error in fetchClientDetails:", error.message || error);
+  
+      // Re-throw the error with additional context
+      throw {
+        message: error.message,
+        response: error.response, // Include response for status handling
+      };
+    }
+  }
+  
+  
+
+  return { isLoggedIn, isAdmin, token, user, users, login, getUserInfo, logout, getAllUsers, createUser, fetchClientDetails };
 });
