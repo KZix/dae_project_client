@@ -30,8 +30,14 @@
       <button @click="goTo('/produtos')" class="button">Lista de Produtos</button>
       <button @click="goTo('/volumes')" class="button">Lista de Volumes</button>
       <button @click="goTo('/encomendas')" class="button">Lista de Encomendas</button>
+      <button @click="goTo('/user')" class="button">Lista de Clientes</button>
+      <button @click="goTo('/user/create')" class="button">Criar Cliente</button>
+      <button @click="goTo('/user/edit')" class="button">Editar Cliente</button>
+      <button @click="goTo('/user/delete')" class="button">Eliminar Cliente</button>
     </div>
-  </div>
+
+    <>
+    </div>
 </template>
 
 <script setup>
