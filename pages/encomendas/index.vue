@@ -1,6 +1,9 @@
 <template>
   <div>
-    <h1>Lista de Encomendas</h1>
+    <h1 class="text-center text-3xl font-bold text-blue-900 mb-6">
+      Lista de Encomendas
+    </h1>
+
     <table class="encomendas-table">
       <thead>
         <tr>
@@ -12,9 +15,10 @@
       <tbody>
         <tr v-for="encomenda in encomendas" :key="encomenda.id">
           <td>
-            <a :href="'/encomendas/' + encomenda.id" class="link-id">
+            <!-- Navegar dinamicamente para /encomendas/:encomendaId -->
+            <nuxt-link :to="`/encomendas/${encomenda.id}`" class="link-id">
               {{ encomenda.id }}
-            </a>
+            </nuxt-link>
           </td>
           <td>{{ encomenda.clienteUsername }}</td>
           <td>{{ encomenda.estado }}</td>
@@ -29,6 +33,7 @@ import { ref, onMounted } from 'vue';
 
 const encomendas = ref([]);
 
+// Buscar a lista de encomendas da API
 const fetchEncomendas = async () => {
   try {
     const response = await fetch('http://localhost:8080/academics/api/encomendas');
@@ -44,21 +49,9 @@ const fetchEncomendas = async () => {
 onMounted(fetchEncomendas);
 </script>
 
-<style>
-body {
-  font-family: 'Inter', sans-serif;
-  color: #333333;
-  background-color: #F3F4F6;
-  margin: 0;
-  padding: 0;
-}
-
+<style scoped>
 h1 {
-  text-align: center;
-  font-size: 2.5rem;
-  font-weight: 700;
-  margin-bottom: 1.5rem;
-  color: #1E3A8A;
+  margin-bottom: 20px;
 }
 
 .encomendas-table {
