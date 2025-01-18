@@ -9,6 +9,7 @@
       <p><strong>Descrição:</strong> {{ volume.descricao }}</p>
       <p><strong>Danificado:</strong> {{ volume.danificado === 1 ? 'Sim' : 'Não' }}</p>
       <p><strong>ID da Encomenda:</strong> {{ volume.encomendaId }}</p>
+      <p><strong>Sensor Atribuído:</strong> {{ volume.sensor ? volume.sensor.nome : 'Nenhum' }}</p>
       <h2 class="text-xl font-bold text-blue-900 mt-4">Produtos</h2>
       <ul>
         <li v-for="produto in volume.produtos" :key="produto.id">
@@ -18,7 +19,26 @@
       <button @click="openAddModal" class="button">Adicionar Produtos</button>
       <button @click="openDeleteModal" class="button-delete">Apagar Produtos</button>
       <button @click="openEditModal" class="button-edit">Editar Volume</button>
+      <button @click="openAddSensorModal" class="button">Atribuir Sensor</button>
+      <button v-if="volume.sensor" @click="removeSensor" class="button-delete">Remover Sensor</button>
       <button @click="goBack" class="button">Voltar para Lista</button>
+    </div>
+
+    <!-- Add Sensor Modal -->
+    <div v-if="showAddSensorModal" class="modal">
+      <div class="modal-content">
+        <span class="close" @click="closeAddSensorModal">&times;</span>
+        <h2>Atribuir Sensor</h2>
+        <div>
+          <label for="sensorSelect">Selecione um Sensor:</label>
+          <select v-model="selectedSensorId" id="sensorSelect">
+  <option v-for="sensor in sensors" :key="sensor.id" :value="sensor.id">
+    Sensor {{ sensor.id }} 
+  </option>
+</select>
+        </div>
+        <button @click="assignSensor" class="button">Atribuir</button>
+      </div>
     </div>
 
     <!-- Add Modal -->
@@ -106,7 +126,65 @@ const selectedDeleteProdutoId = ref(null);
 const editDescricao = ref('');
 const editDanificado = ref(0);
 const editEncomendaId = ref(null);
+const showAddSensorModal = ref(false); 
+const selectedSensorId = ref(null);
+const sensors = ref([]);
 
+const fetchSensors = async () => {
+  try {
+    const response = await fetch('http://localhost:8080/academics/api/sensors');
+    if (!response.ok) {
+      throw new Error(`Erro ao buscar sensores: ${response.statusText}`);
+    }
+    sensors.value = await response.json();
+  } catch (err) {
+    error.value = err.message;
+  }
+};
+
+const openAddSensorModal = () => {
+  showAddSensorModal.value = true;
+  fetchSensors();
+};
+
+const closeAddSensorModal = () => {
+  showAddSensorModal.value = false;
+};
+
+const assignSensor = async () => {
+  try {
+    const response = await fetch(`http://localhost:8080/academics/api/volumes/${route.params.volumeId}/assign-sensor`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ sensorId: selectedSensorId.value }),
+    });
+    if (!response.ok) {
+      throw new Error(`Erro ao atribuir sensor: ${response.statusText}`);
+    }
+    alert('Sensor atribuído com sucesso!');
+    closeAddSensorModal();
+    fetchVolume(); // Refresh volume details
+  } catch (err) {
+    alert(`Erro: ${err.message}`);
+  }
+};
+
+const removeSensor = async () => {
+  try {
+    const response = await fetch(`http://localhost:8080/academics/api/volumes/${route.params.volumeId}/removeSensor`, {
+      method: 'DELETE',
+    });
+    if (!response.ok) {
+      throw new Error(`Erro ao remover sensor: ${response.statusText}`);
+    }
+    alert('Sensor removido com sucesso!');
+    fetchVolume(); // Refresh volume details
+  } catch (err) {
+    alert(`Erro: ${err.message}`);
+  }
+};
 const fetchVolume = async () => {
   try {
     const response = await fetch(`http://localhost:8080/academics/api/volumes/${route.params.volumeId}`);
