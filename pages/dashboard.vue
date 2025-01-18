@@ -17,9 +17,6 @@
     </div>
     <div>
       <Produtos />
-      <div v-if="authStore.isAdmin">
-        <Encomendas />
-      </div>
     </div>
   </template>
   

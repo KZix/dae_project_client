@@ -1,5 +1,6 @@
 <template>
-    <div v-if="error">Error: {{ error.message }}</div>
+  <div>
+    <div v-if="error"></div>
     <div v-else>
       <nuxt-link to="/admins/create">Create a New Admin</nuxt-link>
       <h2>Admins</h2>
@@ -7,19 +8,12 @@
         <thead>
           <tr>
             <th>Username</th>
-            <!-- <th>Name</th>
-            <th>E-mail</th>
-            <th>Course</th>
             <th>Actions</th>
-            <th>Email</th> -->
           </tr>
         </thead>
         <tbody>
-          <tr v-for="admin in admins">
+          <tr v-for="admin in admins" :key="admin.username">
             <td>{{ admin.username }}</td>
-            <!-- <td>{{ admin.name }}</td>
-            <td>{{ admin.email }}</td>
-            <td>{{ admin.courseName }}</td> -->
             <td>
               <nuxt-link :to="`/admins/${admin.username}`">Details</nuxt-link>
             </td>
@@ -32,11 +26,61 @@
         </tbody>
       </table>
     </div>
-    <button @click.prevent="refresh">Refresh Data</button>
-  </template>
-  <script setup>
-  const config = useRuntimeConfig();
-  const api = config.public.API_URL;
-  const { data: admins, error, refresh } = await useFetch(`${api}/admins`);
-  </script>
-  
+    <div class="mt-4">
+      <button @click="goTo('/produtos')" class="button">Lista de Produtos</button>
+      <button @click="goTo('/volumes')" class="button">Lista de Volumes</button>
+      <button @click="goTo('/encomendas')" class="button">Lista de Encomendas</button>
+    </div>
+  </div>
+</template>
+
+<script setup>
+import { ref, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
+const admins = ref([]);
+const error = ref(null);
+
+const fetchAdmins = async () => {
+  try {
+    const response = await fetch('http://localhost:8080/academics/api/admins');
+    if (!response.ok) {
+      throw new Error(`Erro ao buscar admins: ${response.statusText}`);
+    }
+    admins.value = await response.json();
+  } catch (err) {
+    error.value = err.message;
+  }
+};
+
+const refresh = () => {
+  fetchAdmins();
+};
+
+const goTo = (path) => {
+  router.push(path);
+};
+
+onMounted(fetchAdmins);
+</script>
+
+<style scoped>
+.button {
+  background: linear-gradient(90deg, #10B981, #22D3EE);
+  color: #ffffff;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 1rem;
+  margin-right: 1rem;
+}
+
+.button:hover {
+  transform: scale(1.05);
+  background: linear-gradient(90deg, #059669, #0E7490);
+}
+</style>
