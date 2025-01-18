@@ -27,7 +27,7 @@
       </table>
     </div>
     <div class="mt-4">
-      <button @click="goTo('/produtos')" class="button">Lista de Produtos</button>
+      <button @click="goTo('/produtos/produtos-admin')" class="button">Lista de Produtos</button>
       <button @click="goTo('/volumes')" class="button">Lista de Volumes</button>
       <button @click="goTo('/encomendas')" class="button">Lista de Encomendas</button>
       <button @click="goTo('/user')" class="button">Lista de Clientes</button>
