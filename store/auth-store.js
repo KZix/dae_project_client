@@ -96,5 +96,100 @@ export const useAuthStore = defineStore("authStore", () => {
     }
   }
 
-  return { isLoggedIn, isAdmin, token, user, users, login, getUserInfo, logout, getAllUsers };
+  async function createUser(apiUrl, userData) {
+    try {
+      const response = await $fetch(`${apiUrl}/client`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          Authorization: `Bearer ${token.value}`,
+        },
+        body: userData,
+      });
+  
+      // Optionally add the new user to the existing users list
+      users.value.push(response);
+  
+      console.log("User created successfully:", response);
+      return response; // Return the created user for further use
+    } catch (error) {
+      console.error("Failed to create user:", error);
+      throw error; // Re-throw the error to handle it in the component
+    }
+  }
+
+  async function fetchClientDetails(apiUrl, username) {
+    try {
+      const response = await $fetch(`${apiUrl}/client/${username}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          Authorization: `Bearer ${token.value}`,
+        },
+      });
+  
+      if (response && response.username) {
+        console.log("Client details fetched successfully:", response);
+        return response; // Return the client details
+      } else {
+        throw new Error("Invalid API response structure.");
+      }
+    } catch (error) {
+      console.error("Error in fetchClientDetails:", error.message || error);
+  
+      // Re-throw the error with additional context
+      throw {
+        message: error.message,
+        response: error.response, // Include response for status handling
+      };
+    }
+  }
+  
+  async function updateClient(apiUrl, username, updatedData) {
+    try {
+      const response = await $fetch(`${apiUrl}/client/${username}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          Authorization: `Bearer ${token.value}`,
+        },
+        body: updatedData,
+      });
+
+      console.log("Client updated successfully:", response);
+      return response; // Return the updated client details
+    } catch (error) {
+      console.error("Failed to update client:", error);
+      throw error; // Re-throw the error for handling in the component
+    }
+  }
+
+  async function deleteClient(apiUrl, username) {
+    try {
+      const response = await $fetch(`${apiUrl}/client/${username}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          Authorization: `Bearer ${token.value}`,
+        },
+      });
+  
+      console.log(`Client ${username} deleted successfully`, response);
+  
+      // Optionally, remove the deleted user from the `users` list
+      users.value = users.value.filter((user) => user.username !== username);
+  
+      return response; // Return the response if needed
+    } catch (error) {
+      console.error(`Failed to delete client ${username}:`, error);
+      throw error; // Re-throw for handling in the component
+    }
+  }
+  
+
+  return { isLoggedIn, isAdmin, token, user, users, login, getUserInfo, logout, getAllUsers, createUser, fetchClientDetails, updateClient, deleteClient };
 });

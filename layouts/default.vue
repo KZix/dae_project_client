@@ -41,7 +41,19 @@ function logout() {
           to="/user"
           class="hover:text-blue-300 transition-colors duration-300"
         >
-          Clients
+          TodosClientes
+        </nuxt-link>
+        <nuxt-link v-if="authStore.isAdmin"
+          to="/user/create"
+          class="hover:text-blue-300 transition-colors duration-300"
+        >
+          CriarClientes
+        </nuxt-link>
+        <nuxt-link v-if="authStore.isAdmin"
+          to="/user/edit"
+          class="hover:text-blue-300 transition-colors duration-300"
+        >
+          EditarClientes
         </nuxt-link>
 
         <!-- Logout Button: Visible only if logged in -->
