@@ -26,6 +26,7 @@ function logout() {
         <nuxt-link
           to="/admins"
           class="hover:text-blue-300 transition-colors duration-300"
+          v-if="authStore.isAdmin"
         >
           Admins
         </nuxt-link>
