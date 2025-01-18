@@ -15,15 +15,15 @@
           {{ produto.nome }} - {{ produto.tipoProduto.nome }}
         </li>
       </ul>
-      <button @click="openModal" class="button">Adicionar Produtos</button>
+      <button @click="openAddModal" class="button">Adicionar Produtos</button>
+      <button @click="openDeleteModal" class="button-delete">Apagar Produtos</button>
       <button @click="goBack" class="button">Voltar para Lista</button>
-      <button @click="deleteVolume" class="button-delete">DELETE</button>
     </div>
 
-    <!-- Modal -->
-    <div v-if="showModal" class="modal">
+    <!-- Add Modal -->
+    <div v-if="showAddModal" class="modal">
       <div class="modal-content">
-        <span class="close" @click="closeModal">&times;</span>
+        <span class="close" @click="closeAddModal">&times;</span>
         <h2>Adicionar Produtos</h2>
         <div>
           <label for="produtoSelect">Selecione os Produtos:</label>
@@ -42,6 +42,23 @@
         <button @click="saveProdutos" class="button">Salvar</button>
       </div>
     </div>
+
+    <!-- Delete Modal -->
+    <div v-if="showDeleteModal" class="modal">
+      <div class="modal-content">
+        <span class="close" @click="closeDeleteModal">&times;</span>
+        <h2>Apagar Produtos</h2>
+        <div>
+          <label for="deleteProdutoSelect">Selecione os Produtos para Apagar:</label>
+          <select v-model="selectedDeleteProdutoId" id="deleteProdutoSelect">
+            <option v-for="produto in volume.produtos" :key="produto.id" :value="produto.id">
+              {{ produto.nome }}
+            </option>
+          </select>
+        </div>
+        <button @click="deleteProduto" class="button-delete">Apagar</button>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -54,10 +71,12 @@ const router = useRouter();
 const volume = ref(null);
 const loading = ref(true);
 const error = ref(null);
-const showModal = ref(false);
+const showAddModal = ref(false);
+const showDeleteModal = ref(false);
 const produtos = ref([]);
 const selectedProdutoId = ref(null);
 const selectedProdutos = ref([]);
+const selectedDeleteProdutoId = ref(null);
 
 const fetchVolume = async () => {
   try {
@@ -89,13 +108,21 @@ const goBack = () => {
   router.push('/volumes');
 };
 
-const openModal = () => {
-  showModal.value = true;
+const openAddModal = () => {
+  showAddModal.value = true;
   fetchProdutos();
 };
 
-const closeModal = () => {
-  showModal.value = false;
+const closeAddModal = () => {
+  showAddModal.value = false;
+};
+
+const openDeleteModal = () => {
+  showDeleteModal.value = true;
+};
+
+const closeDeleteModal = () => {
+  showDeleteModal.value = false;
 };
 
 const addProduto = () => {
@@ -123,23 +150,30 @@ const saveProdutos = async () => {
       throw new Error(`Erro ao adicionar produtos: ${response.statusText}`);
     }
     alert('Produtos adicionados com sucesso!');
-    closeModal();
+    closeAddModal();
     fetchVolume(); // Refresh volume details
   } catch (err) {
     alert(`Erro: ${err.message}`);
   }
 };
 
-const deleteVolume = async () => {
+const deleteProduto = async () => {
   try {
-    const response = await fetch(`http://localhost:8080/academics/api/volumes/${route.params.volumeId}`, {
+    const ids = [selectedDeleteProdutoId.value];
+    const response = await fetch(`http://localhost:8080/academics/api/volumes/${route.params.volumeId}/removeProdutos`, {
       method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+      body: ({ ids }),
     });
     if (!response.ok) {
-      throw new Error(`Erro ao deletar volume: ${response.statusText}`);
+      throw new Error(`Erro ao apagar produtos: ${response.statusText}`);
     }
-    alert('Volume deletado com sucesso!');
-    goBack();
+    alert('Produtos apagados com sucesso!');
+    closeDeleteModal();
+    fetchVolume(); // Refresh volume details
   } catch (err) {
     alert(`Erro: ${err.message}`);
   }
