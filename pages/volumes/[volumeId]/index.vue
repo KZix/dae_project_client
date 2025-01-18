@@ -17,6 +17,7 @@
       </ul>
       <button @click="openAddModal" class="button">Adicionar Produtos</button>
       <button @click="openDeleteModal" class="button-delete">Apagar Produtos</button>
+      <button @click="openEditModal" class="button-edit">Editar Volume</button>
       <button @click="goBack" class="button">Voltar para Lista</button>
     </div>
 
@@ -59,6 +60,30 @@
         <button @click="deleteProduto" class="button-delete">Apagar</button>
       </div>
     </div>
+
+    <!-- Edit Modal -->
+    <div v-if="showEditModal" class="modal">
+      <div class="modal-content">
+        <span class="close" @click="closeEditModal">&times;</span>
+        <h2>Editar Volume</h2>
+        <div>
+          <label for="descricao">Descrição:</label>
+          <input type="text" v-model="editDescricao" id="descricao" />
+        </div>
+        <div>
+          <label for="danificado">Danificado:</label>
+          <select v-model="editDanificado" id="danificado">
+            <option value="0">Não</option>
+            <option value="1">Sim</option>
+          </select>
+        </div>
+        <div>
+          <label for="encomendaId">ID da Encomenda:</label>
+          <input type="number" v-model="editEncomendaId" id="encomendaId" />
+        </div>
+        <button @click="updateVolume" class="button">Salvar</button>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -73,10 +98,14 @@ const loading = ref(true);
 const error = ref(null);
 const showAddModal = ref(false);
 const showDeleteModal = ref(false);
+const showEditModal = ref(false);
 const produtos = ref([]);
 const selectedProdutoId = ref(null);
 const selectedProdutos = ref([]);
 const selectedDeleteProdutoId = ref(null);
+const editDescricao = ref('');
+const editDanificado = ref(0);
+const editEncomendaId = ref(null);
 
 const fetchVolume = async () => {
   try {
@@ -85,6 +114,9 @@ const fetchVolume = async () => {
       throw new Error(`Erro ao buscar volume: ${response.statusText}`);
     }
     volume.value = await response.json();
+    editDescricao.value = volume.value.descricao;
+    editDanificado.value = volume.value.danificado;
+    editEncomendaId.value = volume.value.encomendaId;
   } catch (err) {
     error.value = err.message;
   } finally {
@@ -125,6 +157,14 @@ const closeDeleteModal = () => {
   showDeleteModal.value = false;
 };
 
+const openEditModal = () => {
+  showEditModal.value = true;
+};
+
+const closeEditModal = () => {
+  showEditModal.value = false;
+};
+
 const addProduto = () => {
   const produto = produtos.value.find(p => p.id === selectedProdutoId.value);
   if (produto && !selectedProdutos.value.some(p => p.id === produto.id)) {
@@ -160,16 +200,44 @@ const saveProdutos = async () => {
 const deleteProduto = async () => {
   try {
     const ids = [selectedDeleteProdutoId.value];
-    await $fetch(`http://localhost:8080/academics/api/volumes/${route.params.volumeId}/removeProdutos`, {
+    const response = await fetch(`http://localhost:8080/academics/api/volumes/${route.params.volumeId}/removeProdutos`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
       },
-      body: ids,
+      body: JSON.stringify({ produtos: ids }),
     });
+    if (!response.ok) {
+      throw new Error(`Erro ao apagar produtos: ${response.statusText}`);
+    }
     alert('Produtos apagados com sucesso!');
     closeDeleteModal();
+    fetchVolume(); // Refresh volume details
+  } catch (err) {
+    alert(`Erro: ${err.message}`);
+  }
+};
+
+const updateVolume = async () => {
+  try {
+    const response = await fetch(`http://localhost:8080/academics/api/volumes/${route.params.volumeId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+      body: JSON.stringify({
+        descricao: editDescricao.value,
+        danificada: editDanificado.value,
+        encomendaId: editEncomendaId.value,
+      }),
+    });
+    if (!response.ok) {
+      throw new Error(`Erro ao atualizar volume: ${response.statusText}`);
+    }
+    alert('Volume atualizado com sucesso!');
+    closeEditModal();
     fetchVolume(); // Refresh volume details
   } catch (err) {
     alert(`Erro: ${err.message}`);
@@ -221,6 +289,23 @@ onMounted(fetchVolume);
 .button-delete:hover {
   transform: scale(1.05);
   background: linear-gradient(90deg, #DC2626, #B91C1C);
+}
+
+.button-edit {
+  background: linear-gradient(90deg, #F59E0B, #FBBF24);
+  color: #ffffff;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 1rem;
+}
+
+.button-edit:hover {
+  transform: scale(1.05);
+  background: linear-gradient(90deg, #D97706, #B45309);
 }
 
 .modal {
