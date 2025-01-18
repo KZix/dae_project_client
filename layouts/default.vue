@@ -36,6 +36,13 @@ function logout() {
           Dashboard
         </nuxt-link>
 
+        <nuxt-link v-if="authStore.isAdmin"
+          to="/user"
+          class="hover:text-blue-300 transition-colors duration-300"
+        >
+          Clients
+        </nuxt-link>
+
         <!-- Logout Button: Visible only if logged in -->
         <a
           v-if="authStore.isLoggedIn"

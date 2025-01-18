@@ -3,6 +3,7 @@ import { defineStore } from "pinia";
 export const useAuthStore = defineStore("authStore", () => {
   const token = ref(null);
   const user = ref(null);
+  const users = ref([]);
 
 
   const isLoggedIn = computed(() => {
@@ -70,5 +71,30 @@ export const useAuthStore = defineStore("authStore", () => {
     localStorage.removeItem("token");
   }
 
-  return { isLoggedIn, isAdmin, token, user, login, getUserInfo, logout };
+  async function getAllUsers(apiUrl){
+    try {
+      const response = await $fetch(`${apiUrl}/client`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          Authorization: `Bearer ${token.value}`,
+        },
+      });
+  
+      // Validate and assign the user data
+      if (response) {
+        users.value = response; 
+        console.log("Users info successfully retrieved:", response);
+      } else {
+        console.error("Unexpected response structure:", response);
+        throw new Error("Invalid user info response format.");
+      }
+    } catch (e) {
+      console.error("Get user info request failed:", e.message || e);
+      throw e; // Re-throw to handle in the calling code
+    }
+  }
+
+  return { isLoggedIn, isAdmin, token, user, users, login, getUserInfo, logout, getAllUsers };
 });
