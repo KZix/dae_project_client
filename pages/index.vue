@@ -5,11 +5,6 @@
     <main class="container mx-auto p-4">
       <h1 class="text-4xl font-bold mb-4">Welcome to UGANDA Management</h1>
       <p class="text-lg mb-6">Manage your orders and products efficiently.</p>
-      <button>Get Started</button>
-      <div class="card">
-        <h2>Feature One</h2>
-        <p>Details about Feature One.</p>
-      </div>
     </main>
     <footer>
       <p>&copy; 2024 UGANDA Management. All rights reserved.</p>
