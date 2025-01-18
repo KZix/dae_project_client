@@ -160,17 +160,14 @@ const saveProdutos = async () => {
 const deleteProduto = async () => {
   try {
     const ids = [selectedDeleteProdutoId.value];
-    const response = await fetch(`http://localhost:8080/academics/api/volumes/${route.params.volumeId}/removeProdutos`, {
+    await $fetch(`http://localhost:8080/academics/api/volumes/${route.params.volumeId}/removeProdutos`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
       },
-      body: ({ ids }),
+      body: ids,
     });
-    if (!response.ok) {
-      throw new Error(`Erro ao apagar produtos: ${response.statusText}`);
-    }
     alert('Produtos apagados com sucesso!');
     closeDeleteModal();
     fetchVolume(); // Refresh volume details
