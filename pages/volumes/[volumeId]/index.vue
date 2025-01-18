@@ -32,7 +32,7 @@
           <label for="sensorSelect">Selecione um Sensor:</label>
           <select v-model="selectedSensorId" id="sensorSelect">
   <option v-for="sensor in sensors" :key="sensor.id" :value="sensor.id">
-    Sensor {{ sensor.id }} - Volume: {{ sensor.volume }}
+    Sensor {{ sensor.id }} 
   </option>
 </select>
         </div>
