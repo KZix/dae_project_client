@@ -40,7 +40,7 @@ function logout() {
           to="/user"
           class="hover:text-blue-300 transition-colors duration-300"
         >
-          Users
+          Clients
         </nuxt-link>
 
         <!-- Logout Button: Visible only if logged in -->

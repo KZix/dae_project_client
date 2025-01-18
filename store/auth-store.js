@@ -3,7 +3,7 @@ import { defineStore } from "pinia";
 export const useAuthStore = defineStore("authStore", () => {
   const token = ref(null);
   const user = ref(null);
-  const users = ref(null);
+  const users = ref([]);
 
 
   const isLoggedIn = computed(() => {
@@ -71,9 +71,9 @@ export const useAuthStore = defineStore("authStore", () => {
     localStorage.removeItem("token");
   }
 
-  async function getAllUsers(){
+  async function getAllUsers(apiUrl){
     try {
-      const response = await $fetch(`${apiUrl}/users`, {
+      const response = await $fetch(`${apiUrl}/client`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
