@@ -25,10 +25,20 @@
           <span class="close" @click="closeModal">&times;</span>
           <h2>Adicionar Produtos</h2>
           <div>
-            <label for="produtoIds">IDs dos Produtos (separados por vírgula):</label>
-            <input type="text" v-model="produtoIds" id="produtoIds" />
+            <label for="produtoSelect">Selecione os Produtos:</label>
+            <select v-model="selectedProdutoId" id="produtoSelect">
+              <option v-for="produto in produtos" :key="produto.id" :value="produto.id">
+                {{ produto.nome }}
+              </option>
+            </select>
           </div>
-          <button @click="addProdutos" class="button">Salvar</button>
+          <button @click="addProduto" class="button">Adicionar</button>
+          <ul>
+            <li v-for="produto in selectedProdutos" :key="produto.id">
+              {{ produto.nome }} <button @click="removeProduto(produto.id)">Remover</button>
+            </li>
+          </ul>
+          <button @click="saveProdutos" class="button">Salvar</button>
         </div>
       </div>
     </div>
@@ -44,7 +54,9 @@
   const loading = ref(true);
   const error = ref(null);
   const showModal = ref(false);
-  const produtoIds = ref('');
+  const produtos = ref([]);
+  const selectedProdutoId = ref(null);
+  const selectedProdutos = ref([]);
   
   const fetchVolume = async () => {
     try {
@@ -60,21 +72,45 @@
     }
   };
   
+  const fetchProdutos = async () => {
+    try {
+      const response = await fetch('http://localhost:8080/academics/api/produtos');
+      if (!response.ok) {
+        throw new Error(`Erro ao buscar produtos: ${response.statusText}`);
+      }
+      produtos.value = await response.json();
+    } catch (err) {
+      error.value = err.message;
+    }
+  };
+  
   const goBack = () => {
     router.push('/volumes');
   };
   
   const openModal = () => {
     showModal.value = true;
+    fetchProdutos();
   };
   
   const closeModal = () => {
     showModal.value = false;
   };
   
-  const addProdutos = async () => {
+  const addProduto = () => {
+    const produto = produtos.value.find(p => p.id === selectedProdutoId.value);
+    if (produto && !selectedProdutos.value.some(p => p.id === produto.id)) {
+      selectedProdutos.value.push(produto);
+    }
+  };
+  
+  const removeProduto = (id) => {
+    selectedProdutos.value = selectedProdutos.value.filter(p => p.id !== id);
+  };
+  
+  const saveProdutos = async () => {
     try {
-      const ids = produtoIds.value.split(',').map(id => parseInt(id.trim()));
+      const ids = selectedProdutos.value.map(p => p.id);
       const response = await fetch(`http://localhost:8080/academics/api/volumes/${route.params.volumeId}/produtos`, {
         method: 'POST',
         headers: {
