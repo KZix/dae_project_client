@@ -115,7 +115,7 @@ const fetchVolume = async () => {
     }
     volume.value = await response.json();
     editDescricao.value = volume.value.descricao;
-    editDanificado.value = volume.value.danificado;
+    editDanificado.value = volume.value.danificada;
     editEncomendaId.value = volume.value.encomendaId;
   } catch (err) {
     error.value = err.message;
