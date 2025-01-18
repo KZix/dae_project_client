@@ -17,7 +17,7 @@
             </nuxt-link>
           </td>
           <td>{{ encomenda.clienteUsername }}</td>
-          <td>{{ encomenda.estado }}</td>
+          <td>{{ getEstadoText(encomenda.estado) }}</td>
         </tr>
       </tbody>
     </table>
@@ -43,6 +43,19 @@ const fetchEncomendas = async () => {
     encomendas.value = await response.json();
   } catch (error) {
     console.error('Erro:', error.message);
+  }
+};
+
+const getEstadoText = (estado) => {
+  switch (estado) {
+    case 0:
+      return 'Pendente';
+    case 1:
+      return 'Enviado';
+    case 2:
+      return 'Recebido';
+    default:
+      return 'Desconhecido';
   }
 };
 
