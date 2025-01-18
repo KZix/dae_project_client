@@ -170,4 +170,69 @@ onMounted(() => {
 });
 </script>
 
+<style scoped>
+h1 {
+  margin-top: 2rem;
+}
+
+form {
+  margin-bottom: 2rem;
+}
+
+label {
+  margin-right: 10px;
+}
+
+input, select {
+  margin-bottom: 1rem;
+  padding: 0.5rem;
+  width: 100%;
+  max-width: 300px;
+}
+
+button {
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #45a049;
+}
+
+ul {
+  list-style-type: none;
+  padding-left: 0;
+}
+
+li {
+  padding: 0.5rem;
+  background-color: #f9f9f9;
+  margin-bottom: 0.5rem;
+}
+
+button {
+  background-color: #2196F3;
+  color: white;
+  border: none;
+  cursor: pointer;
+  padding: 0.3rem 0.6rem;
+  margin-left: 10px;
+}
+
+button:hover {
+  background-color: #0b7dda;
+}
+
+button.delete {
+  background-color: #f44336;
+}
+
+button.delete:hover {
+  background-color: #e53935;
+}
+</style>
+
 
