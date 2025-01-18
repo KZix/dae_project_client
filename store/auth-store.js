@@ -15,8 +15,8 @@ export const useAuthStore = defineStore("authStore", () => {
         body: loginFormData,
       });
 
-      if (response.status === 200) {
-        token.value = response._data; // Assume response._data contains the token
+      if (response) {
+        token.value = response; // Assume response._data contains the token
         localStorage.setItem("token", token.value);
         await getUserInfo(apiUrl); // Fetch user information after login
       } else {
