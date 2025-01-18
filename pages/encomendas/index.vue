@@ -1,9 +1,6 @@
 <template>
   <div>
-    <h1 class="text-center text-3xl font-bold text-blue-900 mb-6">
-      Lista de Encomendas
-    </h1>
-
+    <h1 class="text-center text-3xl font-bold text-blue-900 mb-6">Lista de Encomendas</h1>
     <table class="encomendas-table">
       <thead>
         <tr>
@@ -15,7 +12,6 @@
       <tbody>
         <tr v-for="encomenda in encomendas" :key="encomenda.id">
           <td>
-            <!-- Navegar dinamicamente para /encomendas/:encomendaId -->
             <nuxt-link :to="`/encomendas/${encomenda.id}`" class="link-id">
               {{ encomenda.id }}
             </nuxt-link>
@@ -25,15 +21,19 @@
         </tr>
       </tbody>
     </table>
+    <div class="mt-4">
+      <button @click="goBack" class="button">Voltar para Admins</button>
+    </div>
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
 
+const router = useRouter();
 const encomendas = ref([]);
 
-// Buscar a lista de encomendas da API
 const fetchEncomendas = async () => {
   try {
     const response = await fetch('http://localhost:8080/academics/api/encomendas');
@@ -44,6 +44,10 @@ const fetchEncomendas = async () => {
   } catch (error) {
     console.error('Erro:', error.message);
   }
+};
+
+const goBack = () => {
+  router.push('/admins');
 };
 
 onMounted(fetchEncomendas);
@@ -71,31 +75,24 @@ h1 {
 
 .encomendas-table th,
 .encomendas-table td {
-  padding: 12px 16px;
+  padding: 12px 15px;
   text-align: left;
+}
+
+.button {
+  background: linear-gradient(90deg, #10B981, #22D3EE);
+  color: #ffffff;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
   font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 1rem;
 }
 
-.encomendas-table tbody tr:nth-child(odd) {
-  background-color: #F9FAFB;
-}
-
-.encomendas-table tbody tr:nth-child(even) {
-  background-color: #EFF6FF;
-}
-
-.encomendas-table tbody tr:hover {
-  background-color: #DBEAFE;
-}
-
-.link-id {
-  color: #2563EB;
-  font-weight: bold;
-  text-decoration: none;
-  transition: color 0.3s ease;
-}
-
-.link-id:hover {
-  color: #1E3A8A;
+.button:hover {
+  transform: scale(1.05);
+  background: linear-gradient(90deg, #059669, #0E7490);
 }
 </style>
