@@ -167,5 +167,29 @@ export const useAuthStore = defineStore("authStore", () => {
     }
   }
 
-  return { isLoggedIn, isAdmin, token, user, users, login, getUserInfo, logout, getAllUsers, createUser, fetchClientDetails, updateClient };
+  async function deleteClient(apiUrl, username) {
+    try {
+      const response = await $fetch(`${apiUrl}/client/${username}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          Authorization: `Bearer ${token.value}`,
+        },
+      });
+  
+      console.log(`Client ${username} deleted successfully`, response);
+  
+      // Optionally, remove the deleted user from the `users` list
+      users.value = users.value.filter((user) => user.username !== username);
+  
+      return response; // Return the response if needed
+    } catch (error) {
+      console.error(`Failed to delete client ${username}:`, error);
+      throw error; // Re-throw for handling in the component
+    }
+  }
+  
+
+  return { isLoggedIn, isAdmin, token, user, users, login, getUserInfo, logout, getAllUsers, createUser, fetchClientDetails, updateClient, deleteClient };
 });
