@@ -1,16 +1,35 @@
 <template>
     <div class="card">
-      <h1 class="text-2xl font-bold text-blue-900 mb-4">
-        Detalhes do Volume
-      </h1>
+      <h1 class="text-2xl font-bold text-blue-900 mb-4">Detalhes do Volume</h1>
   
       <div v-if="loading" class="text-gray-500">Carregando...</div>
       <div v-else-if="error" class="text-red-500">{{ error }}</div>
       <div v-else>
         <p><strong>ID:</strong> {{ volume.id }}</p>
         <p><strong>Descrição:</strong> {{ volume.descricao }}</p>
-        <p><strong>Danificado:</strong>{{ volume.danificado === 1 ? 'Sim' : 'Não' }}</p>
+        <p><strong>Danificado:</strong> {{ volume.danificado === 1 ? 'Sim' : 'Não' }}</p>
+        <p><strong>ID da Encomenda:</strong> {{ volume.encomendaId }}</p>
+        <h2 class="text-xl font-bold text-blue-900 mt-4">Produtos</h2>
+        <ul>
+          <li v-for="produto in volume.produtos" :key="produto.id">
+            {{ produto.nome }} - {{ produto.tipoProduto.nome }}
+          </li>
+        </ul>
+        <button @click="openModal" class="button">Adicionar Produtos</button>
         <button @click="goBack" class="button">Voltar para Lista</button>
+      </div>
+  
+      <!-- Modal -->
+      <div v-if="showModal" class="modal">
+        <div class="modal-content">
+          <span class="close" @click="closeModal">&times;</span>
+          <h2>Adicionar Produtos</h2>
+          <div>
+            <label for="produtoIds">IDs dos Produtos (separados por vírgula):</label>
+            <input type="text" v-model="produtoIds" id="produtoIds" />
+          </div>
+          <button @click="addProdutos" class="button">Salvar</button>
+        </div>
       </div>
     </div>
   </template>
@@ -24,8 +43,9 @@
   const volume = ref(null);
   const loading = ref(true);
   const error = ref(null);
+  const showModal = ref(false);
+  const produtoIds = ref('');
   
-  // Buscar detalhes do volume com base no ID
   const fetchVolume = async () => {
     try {
       const response = await fetch(`http://localhost:8080/academics/api/volumes/${route.params.volumeId}`);
@@ -44,31 +64,46 @@
     router.push('/volumes');
   };
   
+  const openModal = () => {
+    showModal.value = true;
+  };
+  
+  const closeModal = () => {
+    showModal.value = false;
+  };
+  
+  const addProdutos = async () => {
+    try {
+      const ids = produtoIds.value.split(',').map(id => parseInt(id.trim()));
+      const response = await fetch(`http://localhost:8080/academics/api/volumes/${route.params.volumeId}/produtos`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(ids),
+      });
+      if (!response.ok) {
+        throw new Error(`Erro ao adicionar produtos: ${response.statusText}`);
+      }
+      alert('Produtos adicionados com sucesso!');
+      closeModal();
+      fetchVolume(); // Refresh volume details
+    } catch (err) {
+      alert(`Erro: ${err.message}`);
+    }
+  };
+  
   onMounted(fetchVolume);
   </script>
   
   <style scoped>
   .card {
-    background: #ffffff;
-    padding: 24px;
-    border-radius: 12px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    margin: 20px auto;
     max-width: 600px;
-    text-align: left;
-  }
-  
-  h1 {
-    font-size: 2rem;
-    font-weight: bold;
-    color: #1E3A8A;
-    margin-bottom: 1rem;
-  }
-  
-  p {
-    font-size: 1rem;
-    color: #333333;
-    margin-bottom: 0.5rem;
+    margin: 0 auto;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #fff;
   }
   
   .button {
@@ -86,5 +121,31 @@
   .button:hover {
     transform: scale(1.05);
     background: linear-gradient(90deg, #059669, #0E7490);
+  }
+  
+  .modal {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+  }
+  
+  .modal-content {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    max-width: 500px;
+    width: 100%;
+  }
+  
+  .close {
+    float: right;
+    font-size: 1.5rem;
+    cursor: pointer;
   }
   </style>
