@@ -16,13 +16,19 @@
       </div>
     </div>
     <div>
-        <!-- div para listar os produtos -->
+      <Produtos />
+      <div v-if="authStore.isAdmin">
+        <Encomendas />
+      </div>
     </div>
   </template>
   
   <script setup>
   import { onMounted } from "vue";
   import { useAuthStore } from "~/store/auth-store.js";
+  import Encomendas from "~/pages/encomendas/index.vue";
+  import Produtos from "~/pages/produtos/lista-produtos.vue";
+
   
   // Get token and user references from the store
   const authStore = useAuthStore();
